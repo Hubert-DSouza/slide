@@ -22,6 +22,11 @@
   - Documented early prototype prompts.
 
 
+* **Hour 1.3: Refactored Codebase into Modular Vite Project (1:55 AM)**
+  - Reorganized single-file codebase into a scalable Vite architecture.
+  - Split responsibilities into dedicated ES modules: `game.js` (core loop), `renderer.js` (canvas rendering), `input.js` (swipes/keys), `levelGenerator.js` (procedural maps), and `solver.js` (BFS validations).
+  - Setup `package.json` configurations and configured Vite packaging tools.
+
 * **Technology Stack Configured:**
   - **Prompt Engineering**: GPT
   - **Prototyping & Algorithms**: Gemini
