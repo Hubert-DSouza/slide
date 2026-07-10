@@ -10,60 +10,82 @@
 </head>
 <body>
 
-<div class="game-container">
-    <aside class="panel">
-        <div class="title">SLIDE.</div>
-        <div class="stat-box">
-            <div class="text-[10px] uppercase opacity-40 mb-1">Current Moves</div>
-            <div id="move-count" class="text-4xl font-bold">0</div>
-        </div>
-        <div class="stat-box">
-            <div class="text-[10px] uppercase opacity-40 mb-1">Target</div>
-            <div id="par-count" class="text-xl font-bold">00</div>
-        </div>
-        <div class="mt-auto flex flex-col gap-2 w-full">
-            <button onclick="game.undo()" class="btn">Undo</button>
-            <button onclick="game.restart()" class="btn">Reset</button>
-        </div>
-    </aside>
-
-    <main class="flex items-center justify-center relative">
-        <div class="relative">
-            <canvas id="game-canvas"></canvas>
-            <div id="win-message" class="overlay hidden">
-                <div class="text-center">
-                    <h2 class="text-4xl font-bold mb-4">SOLVED.</h2>
-                    <button onclick="game.nextLevel()" class="btn px-12">Next Board</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <aside class="panel text-right">
-        <div class="text-[10px] uppercase opacity-40 tracking-widest hidden md:block">Navigation</div>
-        <div class="stat-box text-left">
-            <div class="text-[10px] uppercase opacity-40 mb-1">Level ID</div>
-            <div id="level-id" class="font-bold">#---</div>
-        </div>
-        <div class="stat-box text-left hidden md:block">
-            <div class="text-[10px] uppercase opacity-40 mb-2">Instructions</div>
-            <p class="text-[11px] leading-relaxed opacity-60">Slide to reach the red goal.</p>
-        </div>
-        <div class="mt-auto flex flex-col gap-2 w-full">
-            <button onclick="game.showSolution()" class="btn btn-secondary w-full">Show Solution</button>
-            <button onclick="ui.showDifficultyOverlay()" class="btn w-full">Change Size</button>
-        </div>
-    </aside>
+<div id="screen-home" class="screen">
+    <h1 class="home-title">SLIDE.</h1>
+    <div class="flex flex-col gap-4">
+        <button onclick="ui.showScreen('screen-game'); game.startInfinite('medium')" class="btn btn-large">PLAY</button>
+    </div>
+    <div class="mt-8 text-center">
+        <button onclick="ui.showDifficultyOverlay()" class="text-xs uppercase tracking-wider opacity-50 hover:opacity-100 transition-opacity">Settings & Themes</button>
+    </div>
 </div>
 
-<div id="difficulty-overlay" class="overlay">
+<div id="screen-game" class="screen hidden">
+    <div class="game-container">
+        <aside class="panel">
+            <div class="title">SLIDE.</div>
+            <div class="stat-box stat-moves">
+                <div class="text-[10px] uppercase opacity-40 mb-1">Current Moves</div>
+                <div id="move-count" class="text-4xl font-bold">0</div>
+            </div>
+            <div class="stat-box stat-target">
+                <div class="text-[10px] uppercase opacity-40 mb-1">Target</div>
+                <div id="par-count" class="text-xl font-bold">00</div>
+            </div>
+            <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-1">
+                <button onclick="game.undo()" class="btn btn-undo">Undo</button>
+                <button onclick="game.restart()" class="btn btn-reset">Reset</button>
+                <button onclick="ui.showScreen('screen-home')" class="btn btn-secondary btn-menu">Menu</button>
+            </div>
+        </aside>
+
+        <main class="flex items-center justify-center relative">
+            <div class="relative">
+                <canvas id="game-canvas"></canvas>
+                <div id="win-message" class="overlay hidden">
+                    <div class="text-center">
+                        <h2 class="text-4xl font-bold mb-4">SOLVED.</h2>
+                        <button onclick="game.nextLevel()" class="btn px-12">Next Board</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="panel text-right">
+            <div class="text-[10px] uppercase opacity-40 tracking-widest hidden md:block">Navigation</div>
+            <div class="stat-box stat-level text-left">
+                <div class="mb-4">
+                    <div id="level-id" class="text-xs opacity-50 font-mono">SEED: 0</div>
+                    <div id="level-score" class="text-xs opacity-50 font-mono">SCORE: 0/100</div>
+                </div>
+            </div>
+            <div class="stat-box text-left hidden md:block">
+                <div class="text-[10px] uppercase opacity-40 mb-2">Instructions</div>
+                <p class="text-[11px] leading-relaxed opacity-60">Slide to reach the red goal.</p>
+            </div>
+            <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-2">
+                <button onclick="game.showSolution()" class="btn btn-secondary w-full btn-solution">Show Solution</button>
+                <button onclick="ui.showDifficultyOverlay()" class="btn w-full btn-size">Settings</button>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div id="difficulty-overlay" class="overlay hidden">
     <div class="max-w-xs w-full bg-white p-8 border border-black/5 shadow-2xl">
         <h2 class="text-xl font-bold mb-6">Select Grid</h2>
-        <div class="flex flex-col key-grid gap-2">
+        <div class="flex flex-col key-grid gap-2 mb-8">
             <button onclick="game.init(6)" class="btn bg-slate-200 !text-black hover:!bg-slate-300">Small (6x6)</button>
             <button onclick="game.init(9)" class="btn">Medium (9x9)</button>
             <button onclick="game.init(12)" class="btn bg-red-100 !text-red-700">Large (12x12)</button>
         </div>
+
+        <h2 class="text-xl font-bold mb-6">Select Theme</h2>
+        <div class="flex flex-col gap-2">
+            <button onclick="game.setTheme('minimal')" class="btn btn-secondary">Minimal</button>
+            <button onclick="game.setTheme('ethereal')" class="btn btn-secondary !bg-indigo-100 !text-indigo-900">Ethereal</button>
+        </div>
+        <button onclick="ui.hideDifficultyOverlay()" class="btn mt-6 w-full">Close</button>
     </div>
 </div>
 

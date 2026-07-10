@@ -13,6 +13,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Initial resize
     game.renderer.resize(ui.getCanvasContainer(), game.size);
 
+    // Global button sound — fires on any button click in the app
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('button')) {
+            game.sound.playClick();
+        }
+    });
+
     // Global access for button handlers in HTML (temporary until fully modular)
     window.game = game;
     window.ui = ui;

@@ -6,8 +6,18 @@ export class UI {
             levelId: document.getElementById('level-id'),
             winMessage: document.getElementById('win-message'),
             difficultyOverlay: document.getElementById('difficulty-overlay'),
-            canvasContainer: document.querySelector('main')
+            canvasContainer: document.querySelector('main'),
+            screens: {
+                home: document.getElementById('screen-home'),
+                game: document.getElementById('screen-game')
+            }
         };
+    }
+
+    showScreen(screenId) {
+        Object.values(this.elements.screens).forEach(s => s.classList.add('hidden'));
+        const target = this.elements.screens[screenId.replace('screen-', '')];
+        if (target) target.classList.remove('hidden');
     }
 
     updateStats(moves, par) {
@@ -16,7 +26,11 @@ export class UI {
     }
 
     updateLevelId(seed) {
-        this.elements.levelId.innerText = "#" + seed.toString(16).slice(-4).toUpperCase();
+        this.elements.levelId.innerText = `SEED: ${seed}`;
+    }
+
+    updateScore(score) {
+        document.getElementById('level-score').innerText = `SCORE: ${score}/100`;
     }
 
     showWinMessage() {
