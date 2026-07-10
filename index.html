@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEON SLIDE - Logic Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070a;
+            --wall: #1a1f26;
+            --accent: #00f2ff;
+            --player: #ffffff;
+            --goal: #ff00ea;
+            --trail: rgba(0, 242, 255, 0.3);
+            --text: #ffffff;
+            --panel: rgba(20, 25, 35, 0.8);
+        }
+
+        .theme-pastel {
+            --bg: #f0f4f8;
+            --wall: #cbd5e0;
+            --accent: #ff8fab;
+            --player: #4a5568;
+            --goal: #4fd1c5;
+            --trail: rgba(255, 143, 171, 0.3);
+            --text: #2d3748;
+            --panel: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            user-select: none;
+            touch-action: none;
+            transition: background 0.5s ease;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+        }
+
+        .modal-bg {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-neon {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--accent);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-neon:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .toggle-btn {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .toggle-btn.active {
+            border-color: var(--accent);
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<!-- Top Navigation -->
+<div class="fixed top-0 left-0 w-full p-6 flex justify-between items-start z-40">
+    <div>
+        <h1 class="text-2xl font-black italic tracking-tighter glow-text" id="game-title">NEON SLIDE</h1>
+        <div class="mono text-[10px] opacity-50 uppercase tracking-[0.3em]" id="engine-status">Engine: Optimized</div>
+    </div>
+    <div class="flex gap-4">
+        <button onclick="ui.toggleConfig()" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </button>
+    </div>
+</div>
+
+<!-- Difficulty Selector Modal -->
+<div id="difficulty-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-bg p-6">
+    <div class="max-w-md w-full bg-[var(--bg)] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+        <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tighter">System Access</h2>
+        <p class="mono text-xs opacity-40 mb-8">Select operational parameters for node extraction.</p>
+        
+        <div class="space-y-4">
+            <button onclick="game.init('easy')" class="w-full p-6 text-left border-2 border-white/10 rounded-2xl hover:border-[var(--accent)] transition-all group">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xl uppercase italic">RECON</span>
+                    <span class="text-[10px] mono opacity-50">6x6 GRID</span>
+                </div>
+                <div class="text-xs opacity-40">Low complexity. Standard entry point.</div>
+            </button>
+            <button onclick="game.init('medium')" class="w-full p-6 text-left border-2 border-white/10 rounded-2xl hover:border-[var(--accent)] transition-all group">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xl uppercase italic">STRIKE</span>
+                    <span class="text-[10px] mono opacity-50">9x9 GRID</span>
+                </div>
+                <div class="text-xs opacity-40">Moderate logic branching. Verification required.</div>
+            </button>
+            <button onclick="game.init('hard')" class="w-full p-6 text-left border-2 border-white/10 rounded-2xl hover:border-[var(--accent)] transition-all group">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xl uppercase italic text-red-500">OVERLOAD</span>
+                    <span class="text-[10px] mono opacity-50">12x12 GRID</span>
+                </div>
+                <div class="text-xs opacity-40 text-red-400/50">Maximum path complexity. AI-grade puzzles.</div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Config Modal -->
+<div id="config-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-bg p-6">
+    <div class="max-w-sm w-full bg-[var(--bg)] border border-white/10 rounded-[2rem] p-8">
+        <h2 class="text-2xl font-black italic mb-6 uppercase">System Config</h2>
+        <div class="space-y-3">
+            <button onclick="ui.toggleTheme()" class="toggle-btn" id="theme-btn">
+                <span>Theme</span> <span id="theme-label">Cyber Neon</span>
+            </button>
+            <button onclick="ui.togglePath()" class="toggle-btn" id="path-btn">
+                <span>Path Tracer</span> <span id="path-label">Enabled</span>
+            </button>
+            <button onclick="ui.toggleHardMode()" class="toggle-btn" id="hard-btn">
+                <span>Intersection Guard</span> <span id="hard-label">Disabled</span>
+            </button>
+        </div>
+        <button onclick="ui.toggleConfig()" class="w-full mt-8 py-3 rounded-xl bg-white/5 font-bold uppercase text-xs tracking-widest">Back to Matrix</button>
+    </div>
+</div>
+
+<!-- Game UI Elements -->
+<div class="fixed bottom-0 left-0 w-full p-6 pointer-events-none">
+    <div id="win-message" class="hidden flex flex-col items-center mb-12">
+        <h2 class="text-6xl font-black glow-text italic tracking-tighter" style="color: var(--goal)">SUCCESS</h2>
+        <button onclick="game.nextLevel()" class="btn-neon mt-4 px-10 py-3 rounded-full font-bold uppercase text-xs tracking-widest pointer-events-auto">Next Node</button>
+    </div>
+    
+    <div id="fail-message" class="hidden flex flex-col items-center mb-12">
+        <h2 class="text-5xl font-black italic tracking-tighter text-red-500">PATH OVERLOAD</h2>
+        <div class="mono text-[10px] text-red-400 mt-2">INTERSECTION LIMIT EXCEEDED</div>
+        <button onclick="game.undo()" class="btn-neon mt-4 px-10 py-3 rounded-full font-bold uppercase text-xs tracking-widest border-red-500 text-red-500 pointer-events-auto">Undo Move</button>
+    </div>
+
+    <div class="flex justify-between items-end">
+        <div class="flex gap-4 pointer-events-auto">
+            <div class="bg-black/20 border border-white/10 p-5 rounded-2xl min-w-[140px] backdrop-blur-xl">
+                <div class="mono text-[10px] opacity-40 mb-1 uppercase tracking-widest">Efficiency</div>
+                <div class="flex items-baseline gap-2">
+                    <span id="move-count" class="text-4xl font-bold mono">00</span>
+                    <span class="opacity-20 mono text-lg">/</span>
+                    <span id="par-count" class="opacity-40 mono text-lg">--</span>
+                </div>
+            </div>
+            <div id="cross-panel" class="hidden bg-black/20 border border-red-500/20 p-5 rounded-2xl min-w-[140px] backdrop-blur-xl">
+                <div class="mono text-[10px] text-red-400 opacity-60 mb-1 uppercase tracking-widest">Crossings</div>
+                <div class="flex items-baseline gap-2">
+                    <span id="cross-count" class="text-4xl font-bold mono text-red-500">0</span>
+                    <span class="opacity-20 mono text-lg">/</span>
+                    <span id="cross-max" class="opacity-40 mono text-lg">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex gap-2 pointer-events-auto">
+            <button onclick="game.playSolution()" title="Show Path" class="p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </button>
+            <button onclick="game.undo()" title="Undo (Z)" class="p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+            </button>
+            <button onclick="game.restart()" title="Restart (R)" class="p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<canvas id="game-canvas"></canvas>
+
+<script>
+const CONFIG = {
+    SNAP_THRESHOLD: 0.05,
+    ANIM_SPEED: 0.4,
+    PARTICLE_LIFE: 30,
+    LEVELS: {
+        easy: { size: 6, walls: 0.15, minSteps: 5 },
+        medium: { size: 9, walls: 0.2, minSteps: 10 },
+        hard: { size: 12, walls: 0.25, minSteps: 15 }
+    }
+};
+
+class ParticleSystem {
+    constructor() {
+        this.particles = [];
+    }
+    emit(x, y, color, count = 10, speed = 4) {
+        for(let i=0; i<count; i++) {
+            this.particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * speed,
+                vy: (Math.random() - 0.5) * speed,
+                life: 1.0,
+                color: color
+            });
+        }
+    }
+    update() {
+        this.particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 1/CONFIG.PARTICLE_LIFE;
+        });
+        this.particles = this.particles.filter(p => p.life > 0);
+    }
+}
+
+class LevelGenerator {
+    solve(level) {
+        const queue = [{ x: level.start.x, y: level.start.y, path: [] }];
+        const visited = new Set([`${level.start.x},${level.start.y}`]);
+        const dirs = [{dx:1, dy:0}, {dx:-1, dy:0}, {dx:0, dy:1}, {dx:0, dy:-1}];
+
+        while (queue.length > 0) {
+            const { x, y, path } = queue.shift();
+            if (x === level.end.x && y === level.end.y) return path;
+
+            for (const d of dirs) {
+                let cx = x, cy = y;
+                while (true) {
+                    const nx = cx + d.dx, ny = cy + d.dy;
+                    if (nx < 0 || nx >= level.size || ny < 0 || ny >= level.size || level.grid[ny][nx] === 1) break;
+                    cx = nx; cy = ny;
+                }
+                const key = `${cx},${cy}`;
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    queue.push({ x: cx, y: cy, path: [...path, d] });
+                }
+            }
+        }
+        return null;
+    }
+
+    countIntersections(level, solution) {
+        let count = 0;
+        const visited = new Set([`${level.start.x},${level.start.y}`]);
+        let cx = level.start.x, cy = level.start.y;
+
+        for (const move of solution) {
+            while (true) {
+                const nx = cx + move.dx, ny = cy + move.dy;
+                if (nx < 0 || nx >= level.size || ny < 0 || ny >= level.size || level.grid[ny][nx] === 1) break;
+                cx = nx; cy = ny;
+                const key = `${cx},${cy}`;
+                if (visited.has(key)) count++;
+                visited.add(key);
+            }
+        }
+        return count;
+    }
+
+    generate(mode) {
+        const params = CONFIG.LEVELS[mode];
+        for (let attempt = 0; attempt < 500; attempt++) {
+            const grid = Array(params.size).fill().map(() => Array(params.size).fill(0));
+            for (let y = 0; y < params.size; y++) {
+                for (let x = 0; x < params.size; x++) {
+                    if (Math.random() < params.walls) grid[y][x] = 1;
+                }
+            }
+            const start = { x: 0, y: Math.floor(Math.random() * params.size) };
+            const end = { x: params.size - 1, y: Math.floor(Math.random() * params.size) };
+            grid[start.y][start.x] = 0;
+            grid[end.y][end.x] = 0;
+
+            const map = { size: params.size, grid, start, end };
+            const solution = this.solve(map);
+            if (solution && solution.length >= params.minSteps) {
+                map.par = solution.length;
+                map.solution = solution;
+                map.maxIntersections = this.countIntersections(map, solution);
+                return map;
+            }
+        }
+        return this.generate(mode); // Fallback
+    }
+}
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.generator = new LevelGenerator();
+        this.particles = new ParticleSystem();
+        
+        this.player = { x:0, y:0, vx:0, vy:0 };
+        this.state = 'MENU';
+        this.moves = 0;
+        this.history = [];
+        this.pathPoints = [];
+        this.visitedSet = new Set();
+        this.currentIntersections = 0;
+        
+        this.hardMode = false;
+        this.showPath = true;
+        this.shake = 0;
+        this.isPlayingSolution = false;
+
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('keydown', (e) => this.handleKey(e));
+        this.initTouch();
+        this.resize();
+        this.loop();
+    }
+
+    init(mode) {
+        this.mode = mode;
+        document.getElementById('difficulty-modal').classList.add('hidden');
+        this.nextLevel();
+    }
+
+    nextLevel() {
+        this.level = this.generator.generate(this.mode);
+        this.restart();
+    }
+
+    restart() {
+        this.player.x = this.level.start.x;
+        this.player.y = this.level.start.y;
+        this.player.vx = this.player.x;
+        this.player.vy = this.player.y;
+        this.moves = 0;
+        this.currentIntersections = 0;
+        this.visitedSet = new Set([`${this.player.x},${this.player.y}`]);
+        this.history = [];
+        this.pathPoints = [{ x: this.player.x, y: this.player.y }];
+        this.state = 'PLAYING';
+        this.isPlayingSolution = false;
+        document.getElementById('win-message').classList.add('hidden');
+        document.getElementById('fail-message').classList.add('hidden');
+        this.updateUI();
+    }
+
+    undo() {
+        if (this.history.length > 0 && this.state !== 'WIN') {
+            const last = this.history.pop();
+            this.player.x = last.x; this.player.y = last.y;
+            this.player.vx = last.x; this.player.vy = last.y;
+            this.currentIntersections = last.intersections;
+            this.visitedSet = last.visitedSet;
+            this.pathPoints.pop();
+            this.moves--;
+            this.state = 'PLAYING';
+            document.getElementById('fail-message').classList.add('hidden');
+            this.updateUI();
+        }
+    }
+    move(dx, dy, isInternal = false) {
+        if (this.state !== 'PLAYING') return;
+        if (this.isPlayingSolution && !isInternal) return;
+        
+        let cx = this.player.x, cy = this.player.y;
+        let tempVisited = [];
+        let intersectionsInMove = 0;
+
+        while (true) {
+            const nx = cx + dx, ny = cy + dy;
+            if (nx < 0 || nx >= this.level.size || ny < 0 || ny >= this.level.size || this.level.grid[ny][nx] === 1) break;
+            cx = nx; cy = ny;
+            const key = `${cx},${cy}`;
+            if (this.visitedSet.has(key)) intersectionsInMove++;
+            tempVisited.push(key);
+        }
+
+        if (cx !== this.player.x || cy !== this.player.y) {
+            this.history.push({
+                x: this.player.x, y: this.player.y,
+                intersections: this.currentIntersections,
+                visitedSet: new Set(this.visitedSet)
+            });
+
+            this.player.x = cx;
+            this.player.y = cy;
+            this.moves++;
+            this.currentIntersections += intersectionsInMove;
+            tempVisited.forEach(k => this.visitedSet.add(k));
+            this.pathPoints.push({ x: cx, y: cy });
+            this.updateUI();
+        }
+    }
+
+    async playSolution() {
+        if (this.state === 'WIN' || this.isPlayingSolution) return;
+        
+        const sol = [...this.level.solution];
+        this.restart();
+        
+        // Brief delay to allow restart to settle
+        await new Promise(r => setTimeout(r, 100));
+        this.isPlayingSolution = true;
+        
+        for (const m of sol) {
+            if (!this.isPlayingSolution) break; // Allow interruption if needed
+            this.move(m.dx, m.dy, true);
+            // Wait for movement animation to complete before next step
+            await new Promise(r => setTimeout(r, 500));
+        }
+        this.isPlayingSolution = false;
+    }
+
+    updateUI() {
+        document.getElementById('move-count').innerText = String(this.moves).padStart(2, '0');
+        document.getElementById('par-count').innerText = String(this.level.par).padStart(2, '0');
+        
+        const panel = document.getElementById('cross-panel');
+        if (this.hardMode) {
+            panel.classList.remove('hidden');
+            document.getElementById('cross-count').innerText = this.currentIntersections;
+            document.getElementById('cross-max').innerText = this.level.maxIntersections;
+        } else {
+            panel.classList.add('hidden');
+        }
+    }
+
+    handleKey(e) {
+        if (this.state === 'MENU') return;
+        switch(e.key.toLowerCase()) {
+            case 'arrowup': case 'w': this.move(0, -1); break;
+            case 'arrowdown': case 's': this.move(0, 1); break;
+            case 'arrowleft': case 'a': this.move(-1, 0); break;
+            case 'arrowright': case 'd': this.move(1, 0); break;
+            case 'r': this.restart(); break;
+            case 'z': this.undo(); break;
+            case 'p': this.playSolution(); break;
+        }
+    }
+
+    initTouch() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; });
+        window.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sx;
+            const dy = e.changedTouches[0].clientY - sy;
+            if (Math.hypot(dx, dy) > 30) {
+                if (Math.abs(dx) > Math.abs(dy)) this.move(dx > 0 ? 1 : -1, 0);
+                else this.move(0, dy > 0 ? 1 : -1);
+            }
+        });
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.tileSize = Math.min(this.canvas.width * 0.8, this.canvas.height * 0.6) / (this.level?.size || 10);
+    }
+
+    draw() {
+        const { ctx, canvas, level, tileSize, player } = this;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!level) return;
+
+        const offsetX = (canvas.width - level.size * tileSize) / 2;
+        const offsetY = (canvas.height - level.size * tileSize) / 2;
+
+        ctx.save();
+        if (this.shake > 0) ctx.translate((Math.random()-0.5)*this.shake, (Math.random()-0.5)*this.shake);
+
+        // Grid
+        ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--wall') + '44';
+        ctx.lineWidth = 1;
+        for(let i=0; i<=level.size; i++) {
+            ctx.beginPath(); ctx.moveTo(offsetX + i*tileSize, offsetY); ctx.lineTo(offsetX + i*tileSize, offsetY + level.size*tileSize); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(offsetX, offsetY + i*tileSize); ctx.lineTo(offsetX + level.size*tileSize, offsetY + i*tileSize); ctx.stroke();
+        }
+
+        // Path Tracer
+        if (this.showPath) {
+            ctx.beginPath();
+            ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--accent') + '44';
+            ctx.lineWidth = tileSize * 0.4;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            this.pathPoints.forEach((p, i) => {
+                const px = offsetX + (p.x + 0.5) * tileSize;
+                const py = offsetY + (p.y + 0.5) * tileSize;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            });
+            // Extend to current interpolated pos
+            ctx.lineTo(offsetX + (player.vx + 0.5) * tileSize, offsetY + (player.vy + 0.5) * tileSize);
+            ctx.stroke();
+        }
+
+        // Blocks
+        level.grid.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                if (cell === 1) {
+                    const gx = offsetX + x * tileSize + 4;
+                    const gy = offsetY + y * tileSize + 4;
+                    const gs = tileSize - 8;
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--wall');
+                    ctx.beginPath(); ctx.roundRect(gx, gy, gs, gs, 8); ctx.fill();
+                    ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--accent') + '22';
+                    ctx.stroke();
+                }
+            });
+        });
+
+        // Start/End
+        const drawNode = (p, color, label) => {
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 15; ctx.shadowColor = color;
+            ctx.beginPath(); ctx.arc(offsetX + (p.x+0.5)*tileSize, offsetY + (p.y+0.5)*tileSize, tileSize*0.3, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#000'; ctx.font = '10px bold JetBrains Mono'; ctx.textAlign = 'center';
+            ctx.fillText(label, offsetX + (p.x+0.5)*tileSize, offsetY + (p.y+0.5)*tileSize + 4);
+        };
+        drawNode(level.start, getComputedStyle(document.body).getPropertyValue('--accent'), 'S');
+        drawNode(level.end, getComputedStyle(document.body).getPropertyValue('--goal'), 'E');
+
+        // Player
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--player');
+        ctx.shadowBlur = 10; ctx.shadowColor = ctx.fillStyle;
+        const px = offsetX + player.vx * tileSize + tileSize*0.1;
+        const py = offsetY + player.vy * tileSize + tileSize*0.1;
+        const ps = tileSize * 0.8;
+        ctx.beginPath(); ctx.roundRect(px, py, ps, ps, tileSize*0.2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        this.particles.update();
+        this.particles.particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath(); ctx.arc(offsetX + (p.x+0.5)*tileSize, offsetY + (p.y+0.5)*tileSize, 3, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    update() {
+        if (!this.level || this.state === 'MENU') return;
+
+        const dx = this.player.x - this.player.vx;
+        const dy = this.player.y - this.player.vy;
+
+        if (Math.abs(dx) > CONFIG.SNAP_THRESHOLD || Math.abs(dy) > CONFIG.SNAP_THRESHOLD) {
+            this.player.vx += dx * CONFIG.ANIM_SPEED;
+            this.player.vy += dy * CONFIG.ANIM_SPEED;
+            this.particles.emit(this.player.vx, this.player.vy, getComputedStyle(document.body).getPropertyValue('--accent'), 1, 1);
+        } else {
+            const wasMoving = (this.player.vx !== this.player.x || this.player.vy !== this.player.y);
+            this.player.vx = this.player.x;
+            this.player.vy = this.player.y;
+
+            if (wasMoving) {
+                this.shake = 10;
+                this.particles.emit(this.player.x, this.player.y, '#fff', 15, 5);
+                
+                // Logic Check
+                if (this.hardMode && this.currentIntersections > this.level.maxIntersections) {
+                    this.state = 'FAILED';
+                    document.getElementById('fail-message').classList.remove('hidden');
+                } else if (this.player.x === this.level.end.x && this.player.y === this.level.end.y) {
+                    this.state = 'WIN';
+                    document.getElementById('win-message').classList.remove('hidden');
+                }
+            }
+        }
+
+        if (this.shake > 0) this.shake *= 0.85;
+    }
+
+    loop() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+}
+
+const ui = {
+    toggleConfig: () => {
+        const m = document.getElementById('config-modal');
+        m.classList.toggle('hidden');
+    },
+    toggleTheme: () => {
+        document.body.classList.toggle('theme-pastel');
+        const isPastel = document.body.classList.contains('theme-pastel');
+        document.getElementById('theme-label').innerText = isPastel ? 'Cloud Pastel' : 'Cyber Neon';
+    },
+    togglePath: () => {
+        game.showPath = !game.showPath;
+        document.getElementById('path-label').innerText = game.showPath ? 'Enabled' : 'Disabled';
+    },
+    toggleHardMode: () => {
+        game.hardMode = !game.hardMode;
+        document.getElementById('hard-label').innerText = game.hardMode ? 'Enabled' : 'Disabled';
+        if (game.state !== 'MENU') game.restart();
+    }
+};
+
+const game = new Game();
+</script>
+</body>
+</html>
