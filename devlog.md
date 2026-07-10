@@ -11,7 +11,12 @@
   - Imported the raw single-file HTML5 Canvas prototype (`BlockSlideV1`) generated from initial Gemini sessions.
   - Verified basic rendering and keyboard controls.
 
-* **Hour 0.3: Prompt and Chat Log Infrastructure Setup (1:50 AM)**
+* **Hour 0.5: Prototype V3 - Theme Selector and Clean Path Constraint (2:05 AM)**
+  - Upgraded the single-file prototype (`BlockSlideV3`) to include custom styling, pastel ochre grid lines, and responsive grids.
+  - Implemented the "Clean Path" mode (Intersection Guard) which calculates and enforces minimum path self-intersections.
+  - Integrated "Cloud Pastel" and "Cyber Neon" theme selection and automated solution playback.
+
+* **Hour 0.8: Prompt and Chat Log Infrastructure Setup (2:20 AM)**
   - Created a dedicated `ai_disclosures/` directory to store and track prompt history and conversations automatically.
   - Configured git to track this log so all prompts and assistant steps are maintained transparently as part of the commit history.
   - Documented early prototype prompts.
