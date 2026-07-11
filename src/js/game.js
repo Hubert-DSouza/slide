@@ -56,7 +56,6 @@ export class Game {
         const themeKey = themeId.toUpperCase();
         if (THEMES[themeKey]) {
             this.theme = THEMES[themeKey];
-            this.renderer.setTheme(themeId);
             document.body.className = `theme-${themeId}`;
             this.ui.hideDifficultyOverlay();
             if (this.level) {
