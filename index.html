@@ -77,19 +77,28 @@
 
 <div id="difficulty-overlay" class="overlay hidden">
     <div class="settings-panel">
-        <h2 class="settings-title">Select Grid</h2>
-        <div class="flex flex-col gap-2 mb-8">
-            <button onclick="game.init(6)" class="btn btn-secondary">Small (6x6)</button>
-            <button onclick="game.init(9)" class="btn">Medium (9x9)</button>
-            <button onclick="game.init(12)" class="btn btn-secondary">Large (12x12)</button>
+        <h2 class="settings-title">Settings</h2>
+
+        <!-- Grid Size Settings -->
+        <div class="settings-section">
+            <div class="settings-label">Grid Size</div>
+            <div class="theme-toggle" id="grid-size-toggle">
+                <button id="grid-btn-small" onclick="game.init(6); ui.updateSettingsUI(6, null)" class="theme-toggle-btn">Small</button>
+                <button id="grid-btn-medium" onclick="game.init(9); ui.updateSettingsUI(9, null)" class="theme-toggle-btn active">Medium</button>
+                <button id="grid-btn-large" onclick="game.init(12); ui.updateSettingsUI(12, null)" class="theme-toggle-btn">Large</button>
+            </div>
         </div>
 
-        <h2 class="settings-title">Select Theme</h2>
-        <div class="flex flex-col gap-2">
-            <button onclick="game.setTheme('minimal')" class="btn btn-secondary">Minimal</button>
-            <button onclick="game.setTheme('ethereal')" class="btn btn-secondary">Ethereal</button>
+        <!-- Theme Settings -->
+        <div class="settings-section">
+            <div class="settings-label">Theme</div>
+            <div class="theme-toggle" id="theme-toggle-row">
+                <button id="theme-btn-minimal" class="theme-toggle-btn active" onclick="game.setTheme('minimal'); ui.updateSettingsUI(null, 'minimal')">Minimal</button>
+                <button id="theme-btn-ethereal" class="theme-toggle-btn" onclick="game.setTheme('ethereal'); ui.updateSettingsUI(null, 'ethereal')">Ethereal</button>
+            </div>
         </div>
-        <button onclick="ui.hideDifficultyOverlay()" class="btn mt-6 w-full">Close</button>
+
+        <button onclick="ui.hideDifficultyOverlay()" class="win-next-btn" style="width: 100%; margin-top: 1.5rem;">Done</button>
     </div>
 </div>
 

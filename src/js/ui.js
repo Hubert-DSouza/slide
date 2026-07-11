@@ -112,4 +112,25 @@ export class UI {
     getCanvasContainer() {
         return this.elements.canvasContainer;
     }
+
+    updateSettingsUI(size, themeId) {
+        if (size) {
+            const btnSmall = document.getElementById('grid-btn-small');
+            const btnMedium = document.getElementById('grid-btn-medium');
+            const btnLarge = document.getElementById('grid-btn-large');
+            if (btnSmall && btnMedium && btnLarge) {
+                btnSmall.classList.toggle('active', size === 6);
+                btnMedium.classList.toggle('active', size === 9);
+                btnLarge.classList.toggle('active', size === 12);
+            }
+        }
+        if (themeId) {
+            const btnMinimal = document.getElementById('theme-btn-minimal');
+            const btnEthereal = document.getElementById('theme-btn-ethereal');
+            if (btnMinimal && btnEthereal) {
+                btnMinimal.classList.toggle('active', themeId === 'minimal');
+                btnEthereal.classList.toggle('active', themeId === 'ethereal');
+            }
+        }
+    }
 }
