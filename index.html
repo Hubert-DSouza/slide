@@ -42,7 +42,7 @@
 <div id="screen-game" class="screen hidden">
     <div class="game-container">
         <aside class="panel">
-            <div id="level-title" class="text-[11px] uppercase font-bold tracking-wider opacity-60 mb-1 text-left w-full">Level 1</div>
+            <div id="level-title" class="stat-level text-[11px] uppercase font-bold tracking-wider opacity-60 mb-1 text-left w-full">Level 1</div>
             <div class="stat-box stat-moves">
                 <div class="text-[10px] uppercase opacity-40 mb-1">Current Moves</div>
                 <div id="move-count" class="text-4xl font-bold">0</div>
@@ -83,7 +83,7 @@
 
         <main class="flex flex-col items-center justify-center relative">
             <div id="tutorial-instruction" class="tutorial-instruction hidden"></div>
-            <div class="relative">
+            <div class="relative" style="width: fit-content; height: fit-content; display: inline-block;">
                 <canvas id="game-canvas"></canvas>
                 <div id="win-message" class="overlay hidden">
                     <div class="text-center">
@@ -96,13 +96,13 @@
 
         <aside class="panel text-right">
             <!-- Top Right: Reset and Show Solution -->
-            <div class="flex flex-col gap-2 w-full">
+            <div class="btn-wrapper-1 flex flex-col gap-2 w-full">
                 <button onclick="game.restart()" class="btn btn-reset">Reset</button>
                 <button onclick="game.showSolution()" class="btn btn-secondary w-full btn-solution">Show Solution</button>
             </div>
             
             <!-- Bottom Right: Menu and Settings -->
-            <div class="mt-auto flex flex-col gap-2 w-full">
+            <div class="btn-wrapper-2 mt-auto flex flex-col gap-2 w-full">
                 <button onclick="ui.showScreen('screen-home')" class="btn btn-secondary btn-menu">Menu</button>
                 <button onclick="ui.showDifficultyOverlay()" class="btn w-full btn-size">Settings</button>
             </div>

@@ -12,11 +12,8 @@ export class Renderer {
         this.palette = palette;
     }
 
-    setTheme(themeId) {
-        // kept for compatibility
-    }
-
     setDebug(value) {
+        // debug overlay toggled via 'd' key in input.js
         this.debug = value;
     }
 
@@ -68,7 +65,6 @@ export class Renderer {
         const brokenFragile = modifierState.brokenFragile || new Set();
         const cols = level.size.cols || level.size;
         const rows = level.size.rows || level.size;
-        const isHighGraphics = window.game ? (window.game.graphics === 1) : true;
 
         ctx.clearRect(0, 0, cols * tileSize, rows * tileSize);
 
@@ -204,12 +200,10 @@ export class Renderer {
                 ctx.lineCap = 'round';
 
                 // Extremely soft pencil drop-shadow to ground it physically on the paper
-                if (isHighGraphics) {
-                    ctx.shadowColor = isLightMode ? `rgba(0, 0, 0, ${0.05 * pathOpacityMult})` : `rgba(0, 0, 0, ${0.15 * pathOpacityMult})`;
+                ctx.shadowColor = isLightMode ? `rgba(0, 0, 0, ${0.05 * pathOpacityMult})` : `rgba(0, 0, 0, ${0.15 * pathOpacityMult})`;
                     ctx.shadowBlur = tileSize * 0.015;
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = tileSize * 0.01;
-                }
 
                 ctx.stroke();
             }
@@ -330,7 +324,6 @@ export class Renderer {
         const cy = (end.y + 0.5) * tileSize;
         const pal = this.palette;
         const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && theme.id === 'light');
-        const isHighGraphics = window.game ? (window.game.graphics === 1) : true;
 
         const ringColor = pal ? pal.goalRing : (theme ? theme.colors.accent : 'rgba(255,255,255,0.8)');
         const centerColor = pal ? pal.goalCenter : (isLightMode ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.15)');
@@ -368,16 +361,13 @@ export class Renderer {
         const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && theme.id === 'light');
 
         const playerColor = pal ? pal.player : (isLightMode ? (theme ? theme.colors.text : '#2d3436') : '#ffffff');
-        const isHighGraphics = window.game ? (window.game.graphics === 1) : true;
-
         ctx.save();
-        // Physical, grounded drop shadow to look like a premium board game token
-        if (isHighGraphics) {
-            ctx.shadowColor = isLightMode ? 'rgba(0, 0, 0, 0.16)' : 'rgba(0, 0, 0, 0.38)';
-            ctx.shadowBlur = tileSize * 0.08;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = tileSize * 0.04;
-        }
+        // Physical, grounded drop shadow
+        ctx.shadowColor = isLightMode ? 'rgba(0, 0, 0, 0.16)' : 'rgba(0, 0, 0, 0.38)';
+        ctx.shadowBlur = tileSize * 0.08;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = tileSize * 0.04;
+
 
         let radiusScale = 0.22;
         if (modifierState.dockProgress > 0) {
@@ -509,13 +499,9 @@ export class Renderer {
 
 
 
-        const isHighGraphics = window.game ? (window.game.graphics === 1) : true;
-
         ctx.save();
-        if (isHighGraphics) {
-            ctx.shadowColor = colorA;
-            ctx.shadowBlur = tileSize * 0.08;
-        }
+        ctx.shadowColor = colorA;
+        ctx.shadowBlur = tileSize * 0.08;
 
         // Outer ring
         ctx.strokeStyle = colorA;

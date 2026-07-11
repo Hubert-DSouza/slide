@@ -71,8 +71,8 @@ export class UI {
             block.style.width = `${w * cellSize}px`;
             block.style.height = `${h * cellSize}px`;
 
-            // Random opacity between 0.008 and 0.035 for subtle visual differences
-            const opacity = (Math.random() * 0.027 + 0.008).toFixed(3);
+            // Zen aesthetic: static blocks with varying subtle opacities (between 0.015 and 0.055)
+            const opacity = (Math.random() * 0.04 + 0.015).toFixed(3);
             block.style.backgroundColor = 'var(--text)';
             block.style.opacity = opacity;
 

@@ -2,4 +2,6 @@ node_modules/
 dist/
 .env
 .vercel/
-ai_disclosures/
+ai_disclosures/chats.md
+.vite/
+.vite_temp*/

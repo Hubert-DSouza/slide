@@ -1,4 +1,4 @@
-import { SETTINGS, TILE_WALL, TILE_FRAGILE, TILE_TELEPORT_A, TILE_TELEPORT_B, THEMES, COLORS, getMonochromePalette } from './constants.js';
+import { SETTINGS, TILE_WALL, TILE_FRAGILE, TILE_TELEPORT_A, TILE_TELEPORT_B, THEMES, getMonochromePalette } from './constants.js';
 import { LevelGenerator } from './levelGenerator.js';
 import { SoundEngine } from './sound.js';
 
@@ -19,7 +19,6 @@ export class Game {
         this.isSolving = false;
         this.isUndoing = false;
         this.undoTrailPoint = null;
-        this.debug = false;
         this.level = null;
         
         // Win animations
@@ -105,10 +104,7 @@ export class Game {
         this.restart();
     }
 
-    setDebug(value) {
-        this.debug = value;
-        this.renderer.setDebug(value);
-    }
+
 
     nextLevel(forcedSeed = null) {
         if (this.mode === 'TUTORIAL') {
@@ -184,7 +180,6 @@ export class Game {
         this.activeGrid = this.level.grid.map(row => [...row]);
         this.brokenFragile = new Set();
         this.pathCells = new Set([`${this.level.start.x},${this.level.start.y}`]);
-        this.crossingsLeft = this.level.solutionCrossings || 0;
 
         this.state = 'PLAYING';
         this.ui.hideWinMessage();
@@ -228,8 +223,6 @@ export class Game {
     move(dx, dy) {
         if (this.state !== 'PLAYING' || this.isUndoing) return;
 
-        // Hide HUD on any interaction/move (if helper exists)
-        if (this.ui.hideGameHUD) this.ui.hideGameHUD();
 
         if (this.isMoving()) {
             const totalDist = Math.hypot(this.player.x - this.player.moveStartX, this.player.y - this.player.moveStartY);
@@ -294,7 +287,6 @@ export class Game {
                         this.activeGrid = snap.activeGrid.map(r => [...r]);
                         this.brokenFragile = new Set(snap.brokenFragile);
                         this.pathCells = new Set(snap.pathCells);
-                        this.crossingsLeft = snap.crossingsLeft;
                     }
 
                     // Perform the move logically starting from last.x, last.y but visually starting from player.vx, player.vy
@@ -333,8 +325,7 @@ export class Game {
                     const newModifierSnapshot = {
                         activeGrid: restoredGrid.map(r => [...r]),
                         brokenFragile: new Set(this.brokenFragile),
-                        pathCells: new Set(this.pathCells),
-                        crossingsLeft: this.crossingsLeft
+                        pathCells: new Set(this.pathCells)
                     };
                     this.history.push({ x: last.x, y: last.y, modifierSnapshot: newModifierSnapshot });
 
@@ -398,8 +389,7 @@ export class Game {
         const modifierSnapshot = {
             activeGrid: (this.activeGrid || this.level.grid).map(r => [...r]),
             brokenFragile: new Set(this.brokenFragile),
-            pathCells: new Set(this.pathCells),
-            crossingsLeft: this.crossingsLeft
+            pathCells: new Set(this.pathCells)
         };
 
         this.history.push({ x: this.player.x, y: this.player.y, modifierSnapshot });
@@ -456,15 +446,6 @@ export class Game {
                 this.state = 'WIN';
                 this.rippleTimer = this.rippleDuration;
 
-                if (this.mode === 'TUTORIAL') {
-                    const compLvl = this.playingJourneyLevel;
-                    if (compLvl === 5) {
-                        localStorage.setItem('blockslide_tutorial_completed', 'true');
-                        this.startInfinite(this.infiniteDifficulty);
-                        return;
-                    }
-                    this.playingJourneyLevel++;
-                }
                 this.ui.showWinMessage();
             }
             return;
