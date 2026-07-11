@@ -13,6 +13,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // Initial resize
     game.renderer.resize(ui.getCanvasContainer(), game.size);
 
+    // Generate home decoration blocks
+    ui.generateHomeDecor();
+
     // Global button sound — fires on any button click in the app
     document.addEventListener('click', (e) => {
         if (e.target.closest('button')) {
@@ -26,6 +29,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => {
         game.renderer.resize(ui.getCanvasContainer(), game.size);
+        if (!ui.elements.screens.home.classList.contains('hidden')) {
+            ui.generateHomeDecor();
+        }
     });
 
     // Start game loop

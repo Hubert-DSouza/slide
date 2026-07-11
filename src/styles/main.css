@@ -1,21 +1,25 @@
 :root {
     --bg: #fdfaf7;
     --text: #2d3436;
+    --text-muted: rgba(45, 52, 54, 0.4);
     --accent: #d63031;
     --path: #2d3436;
     --player: #ffffff;
     --panel-bg: rgba(255, 255, 255, 0.8);
     --border: rgba(0, 0, 0, 0.08);
-    --font: 'Space Grotesk', sans-serif;
+    --font: 'Plus Jakarta Sans', sans-serif;
+    --home-grid: rgba(0, 0, 0, 0.035);
 }
 
 body.theme-dark {
     --bg: #1a1a1a;
     --text: #fdfaf7;
+    --text-muted: rgba(253, 250, 247, 0.4);
     --accent: #ff4757;
     --path: #fdfaf7;
     --panel-bg: rgba(255, 255, 255, 0.05);
     --border: rgba(255, 255, 255, 0.1);
+    --home-grid: rgba(255, 255, 255, 0.015);
 }
 
 body.theme-ethereal {
@@ -65,37 +69,82 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: radial-gradient(circle at center, rgba(0,0,0,0.02) 0%, transparent 70%);
+    background-image: linear-gradient(var(--home-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--home-grid) 1px, transparent 1px);
+    background-size: 80px 80px;
+    background-position: top left;
+    background-repeat: repeat;
 }
 
-.home-title {
-    font-size: clamp(4rem, 15vw, 8rem);
-    font-weight: 700;
-    letter-spacing: -0.05em;
-    line-height: 1;
-    margin-bottom: 2rem;
-    position: relative;
-}
-
-.home-title::after {
-    content: '';
+.home-decor-block {
     position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--accent);
-    z-index: -1;
-    opacity: 0.8;
-    filter: blur(15px);
-    animation: pulse 4s infinite;
+    z-index: 1;
+    pointer-events: none;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
-    50% { transform: translateX(-50%) scale(1.5); opacity: 0.8; }
+.home-logo,
+.home-btn-group {
+    position: relative;
+    z-index: 5;
+}
+
+.home-logo {
+    font-size: clamp(5.5rem, 25vw, 10.5rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 0.9;
+    color: var(--text);
+    margin: 0 0 1rem;
+}
+
+.home-subtitle {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin: -0.25rem 0 1.5rem;
+    opacity: 0.8;
+    z-index: 5;
+    position: relative;
+    max-width: 280px;
+    line-height: 1.4;
+}
+
+.home-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    width: 100%;
+    max-width: 440px;
+    margin-top: 3.5rem;
+}
+
+.home-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--text);
+    border-radius: 0;
+    padding: 1.35rem 3rem;
+    font-family: var(--font);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, background-color 0.2s;
+    position: relative;
+    z-index: 5;
+}
+
+.home-btn-primary {
+    background: var(--text);
+    color: var(--bg);
+    border: 1px solid var(--text);
+}
+
+.home-btn:active {
+    opacity: 0.85;
 }
 
 .game-container {
