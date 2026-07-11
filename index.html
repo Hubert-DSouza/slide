@@ -17,17 +17,31 @@
     <h1 class="home-logo">SLIDE.</h1>
 
     <div class="home-btn-group">
-        <button id="btn-home-play" class="home-btn home-btn-primary" onclick="ui.showScreen('screen-game'); game.startInfinite('medium')">
+        <!-- Segmented Toggle for Difficulty on Home Screen -->
+        <div style="width: 100%; margin-bottom: 0.5rem; z-index: 5;">
+            <div class="settings-label" style="text-align: center; margin-bottom: 0.5rem;">Difficulty</div>
+            <div class="theme-toggle" id="home-difficulty-toggle">
+                <button id="home-diff-easy" onclick="game.setDifficulty('easy')" class="theme-toggle-btn">Easy</button>
+                <button id="home-diff-medium" onclick="game.setDifficulty('medium')" class="theme-toggle-btn active">Medium</button>
+                <button id="home-diff-hard" onclick="game.setDifficulty('hard')" class="theme-toggle-btn">Hard</button>
+            </div>
+        </div>
+
+        <button id="btn-home-play" class="home-btn home-btn-primary" onclick="ui.showScreen('screen-game'); game.startInfinite(game.infiniteDifficulty)">
             PLAY
         </button>
         <button class="home-btn" onclick="ui.showDifficultyOverlay()">SETTINGS</button>
+    </div>
+
+    <!-- Watermark footer -->
+    <div style="position: absolute; bottom: 2rem; left: 0; right: 0; text-align: center; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--text-muted); opacity: 0.45; z-index: 5;">
+        Developed by Hubert DSouza
     </div>
 </div>
 
 <div id="screen-game" class="screen hidden">
     <div class="game-container">
         <aside class="panel">
-            <div class="title">SLIDE.</div>
             <div class="stat-box stat-moves">
                 <div class="text-[10px] uppercase opacity-40 mb-1">Current Moves</div>
                 <div id="move-count" class="text-4xl font-bold">0</div>
@@ -36,9 +50,33 @@
                 <div class="text-[10px] uppercase opacity-40 mb-1">Optimal</div>
                 <div id="par-count" class="text-4xl font-bold">00</div>
             </div>
-            <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-1">
-                <button onclick="game.restart()" class="btn btn-reset">Reset</button>
-                <button onclick="ui.showScreen('screen-home')" class="btn btn-secondary btn-menu">Menu</button>
+            <!-- Keyboard guide overlay in bottom left -->
+            <div class="keyboard-guide mt-auto relative !bottom-0 !left-0 !opacity-100 !pointer-events-auto flex flex-col items-start gap-2">
+                <div class="keyboard-layout-wrapper flex items-end gap-3">
+                    <div class="keys-container flex flex-col gap-1 items-center">
+                        <div class="key-row flex gap-1">
+                            <div class="key-cap" id="key-up">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </div>
+                        </div>
+                        <div class="key-row flex gap-1">
+                            <div class="key-cap" id="key-left">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </div>
+                            <div class="key-cap" id="key-down">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="key-cap" id="key-right">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="key-cap clickable-key" id="key-r" onclick="game.restart()" title="Reset Level" style="font-weight: 800; font-size: 0.75rem; font-family: var(--font); cursor: pointer; user-select: none;">
+                        R
+                    </div>
+                </div>
+                <div class="guide-text" style="font-size: 0.65rem;">Arrows to move / R to reset</div>
             </div>
         </aside>
 
@@ -55,8 +93,15 @@
         </main>
 
         <aside class="panel text-right">
-            <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-2">
+            <!-- Top Right: Reset and Show Solution -->
+            <div class="flex flex-col gap-2 w-full">
+                <button onclick="game.restart()" class="btn btn-reset">Reset</button>
                 <button onclick="game.showSolution()" class="btn btn-secondary w-full btn-solution">Show Solution</button>
+            </div>
+            
+            <!-- Bottom Right: Menu and Settings -->
+            <div class="mt-auto flex flex-col gap-2 w-full">
+                <button onclick="ui.showScreen('screen-home')" class="btn btn-secondary btn-menu">Menu</button>
                 <button onclick="ui.showDifficultyOverlay()" class="btn w-full btn-size">Settings</button>
             </div>
         </aside>
@@ -67,13 +112,13 @@
     <div class="settings-panel">
         <h2 class="settings-title">Settings</h2>
 
-        <!-- Grid Size Settings -->
+        <!-- Difficulty Settings -->
         <div class="settings-section">
-            <div class="settings-label">Grid Size</div>
+            <div class="settings-label">Difficulty</div>
             <div class="theme-toggle" id="grid-size-toggle">
-                <button id="grid-btn-small" onclick="game.init(6); ui.updateSettingsUI(6, null)" class="theme-toggle-btn">Small</button>
-                <button id="grid-btn-medium" onclick="game.init(9); ui.updateSettingsUI(9, null)" class="theme-toggle-btn active">Medium</button>
-                <button id="grid-btn-large" onclick="game.init(12); ui.updateSettingsUI(12, null)" class="theme-toggle-btn">Large</button>
+                <button id="grid-btn-small" onclick="game.setDifficulty('easy')" class="theme-toggle-btn">Easy</button>
+                <button id="grid-btn-medium" onclick="game.setDifficulty('medium')" class="theme-toggle-btn active">Medium</button>
+                <button id="grid-btn-large" onclick="game.setDifficulty('hard')" class="theme-toggle-btn">Hard</button>
             </div>
         </div>
 
@@ -81,8 +126,8 @@
         <div class="settings-section">
             <div class="settings-label">Theme</div>
             <div class="theme-toggle" id="theme-toggle-row">
-                <button id="theme-btn-minimal" class="theme-toggle-btn active" onclick="game.setTheme('minimal'); ui.updateSettingsUI(null, 'minimal')">Minimal</button>
-                <button id="theme-btn-ethereal" class="theme-toggle-btn" onclick="game.setTheme('ethereal'); ui.updateSettingsUI(null, 'ethereal')">Ethereal</button>
+                <button id="theme-btn-light" class="theme-toggle-btn active" onclick="game.setTheme('light'); ui.updateSettingsUI(null, 'light')">Light</button>
+                <button id="theme-btn-dark" class="theme-toggle-btn" onclick="game.setTheme('dark'); ui.updateSettingsUI(null, 'dark')">Dark</button>
             </div>
         </div>
 

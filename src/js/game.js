@@ -1,4 +1,4 @@
-import { SETTINGS, TILE_WALL, THEMES, COLORS } from './constants.js';
+import { SETTINGS, TILE_WALL, THEMES, COLORS, getMonochromePalette } from './constants.js';
 import { LevelGenerator } from './levelGenerator.js';
 import { SoundEngine } from './sound.js';
 
@@ -15,18 +15,31 @@ export class Game {
         this.pathPoints = [];
         this.state = 'MENU';
         this.size = SETTINGS.DEFAULT_SIZE;
-        this.theme = THEMES.MINIMAL;
+        this.theme = THEMES.LIGHT;
         this.isSolving = false;
         this.debug = false;
         this.level = null;
         
         this.mode = 'INFINITE';
+        this.infiniteDifficulty = 'medium';
     }
 
     init(size) {
         this.size = size;
         this.renderer.resize(this.ui.getCanvasContainer(), this.size);
         this.ui.hideDifficultyOverlay();
+        if (this.state === 'PLAYING') {
+            this.nextLevel();
+        }
+    }
+
+    setDifficulty(difficulty) {
+        this.infiniteDifficulty = difficulty;
+        if (difficulty === 'easy') this.size = 6;
+        if (difficulty === 'medium') this.size = 9;
+        if (difficulty === 'hard') this.size = 12;
+        
+        this.ui.updateSettingsUI(this.size, null);
         if (this.state === 'PLAYING') {
             this.nextLevel();
         }
@@ -47,10 +60,10 @@ export class Game {
 
     startInfinite(difficulty) {
         this.mode = 'INFINITE';
-        this.infiniteDifficulty = difficulty; // 'easy', 'medium', 'hard'
-        if (difficulty === 'easy') this.size = 6;
-        if (difficulty === 'medium') this.size = 9;
-        if (difficulty === 'hard') this.size = 12;
+        this.infiniteDifficulty = difficulty || 'medium';
+        if (this.infiniteDifficulty === 'easy') this.size = 6;
+        if (this.infiniteDifficulty === 'medium') this.size = 9;
+        if (this.infiniteDifficulty === 'hard') this.size = 12;
         
         this.ui.showScreen('screen-game');
         this.nextLevel();
@@ -73,7 +86,11 @@ export class Game {
         
         this.ui.updateLevelId(seed);
         
-        this.level = this.generator.generate(config, this.theme.colors.blocks, seed);
+        // Generate and set monochrome palette for level theme
+        const palette = getMonochromePalette(seed, this.theme.id);
+        this.renderer.setPalette(palette);
+        
+        this.level = this.generator.generate(config, palette.obstacles, seed);
         this.ui.updateScore(this.level.score);
         
         this.state = 'PLAYING';

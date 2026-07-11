@@ -39,6 +39,12 @@ export class Renderer {
         this.canvas.style.width = `${logicalW}px`;
         this.canvas.style.height = `${logicalH}px`;
 
+        // Align left/right panel heights to match the canvas height exactly
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(panel => {
+            panel.style.height = `${logicalH}px`;
+        });
+
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
 
@@ -62,7 +68,7 @@ export class Renderer {
         ctx.fillRect(0, 0, cols * tileSize, rows * tileSize);
 
         // Grid lines
-        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme.id === 'minimal' || theme.id === 'ethereal');
+        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme.id === 'light');
         const gridColor = pal ? pal.gridLine : (isLightMode ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)');
         ctx.strokeStyle = gridColor;
         ctx.lineWidth = 1;
@@ -117,7 +123,7 @@ export class Renderer {
         if (pathPoints.length > 0) {
             ctx.save();
             const pathColor = pal ? pal.path : (theme.colors.path || '#fff');
-            const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme.id === 'minimal' || theme.id === 'ethereal');
+            const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme.id === 'light');
 
             // Map pathPoints and player to screen/canvas coordinates, filtering out consecutive duplicates
             const rawPts = [...pathPoints, { x: player.vx, y: player.vy }];
@@ -314,7 +320,7 @@ export class Renderer {
         const cx = (end.x + 0.5) * tileSize;
         const cy = (end.y + 0.5) * tileSize;
         const pal = this.palette;
-        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && (theme.id === 'minimal' || theme.id === 'ethereal'));
+        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && theme.id === 'light');
         const isHighGraphics = window.game ? (window.game.graphics === 1) : true;
 
         const ringColor = pal ? pal.goalRing : (theme ? theme.colors.accent : 'rgba(255,255,255,0.8)');
@@ -350,7 +356,7 @@ export class Renderer {
         const cx = (player.vx + 0.5) * tileSize;
         const cy = (player.vy + 0.5) * tileSize;
         const pal = this.palette;
-        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && (theme.id === 'minimal' || theme.id === 'ethereal'));
+        const isLightMode = pal ? (pal.bg === '#f7f5f2') : (theme && theme.id === 'light');
 
         const playerColor = pal ? pal.player : (isLightMode ? (theme ? theme.colors.text : '#2d3436') : '#ffffff');
         const isHighGraphics = window.game ? (window.game.graphics === 1) : true;

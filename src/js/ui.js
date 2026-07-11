@@ -120,21 +120,20 @@ export class UI {
 
     updateSettingsUI(size, themeId) {
         if (size) {
-            const btnSmall = document.getElementById('grid-btn-small');
-            const btnMedium = document.getElementById('grid-btn-medium');
-            const btnLarge = document.getElementById('grid-btn-large');
-            if (btnSmall && btnMedium && btnLarge) {
-                btnSmall.classList.toggle('active', size === 6);
-                btnMedium.classList.toggle('active', size === 9);
-                btnLarge.classList.toggle('active', size === 12);
-            }
+            const easyBtns = [document.getElementById('grid-btn-small'), document.getElementById('home-diff-easy')];
+            const mediumBtns = [document.getElementById('grid-btn-medium'), document.getElementById('home-diff-medium')];
+            const hardBtns = [document.getElementById('grid-btn-large'), document.getElementById('home-diff-hard')];
+            
+            easyBtns.forEach(b => { if (b) b.classList.toggle('active', size === 6); });
+            mediumBtns.forEach(b => { if (b) b.classList.toggle('active', size === 9); });
+            hardBtns.forEach(b => { if (b) b.classList.toggle('active', size === 12); });
         }
         if (themeId) {
-            const btnMinimal = document.getElementById('theme-btn-minimal');
-            const btnEthereal = document.getElementById('theme-btn-ethereal');
-            if (btnMinimal && btnEthereal) {
-                btnMinimal.classList.toggle('active', themeId === 'minimal');
-                btnEthereal.classList.toggle('active', themeId === 'ethereal');
+            const btnLight = document.getElementById('theme-btn-light');
+            const btnDark = document.getElementById('theme-btn-dark');
+            if (btnLight && btnDark) {
+                btnLight.classList.toggle('active', themeId === 'light');
+                btnDark.classList.toggle('active', themeId === 'dark');
             }
         }
     }

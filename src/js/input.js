@@ -12,6 +12,15 @@ export class Input {
 
     initKeyboard() {
         window.addEventListener('keydown', (e) => {
+            // Visual keypress indicator highlight
+            let keyEl = null;
+            if (e.key === 'ArrowUp') keyEl = document.getElementById('key-up');
+            else if (e.key === 'ArrowDown') keyEl = document.getElementById('key-down');
+            else if (e.key === 'ArrowLeft') keyEl = document.getElementById('key-left');
+            else if (e.key === 'ArrowRight') keyEl = document.getElementById('key-right');
+            else if (e.key === 'r' || e.key === 'R') keyEl = document.getElementById('key-r');
+            if (keyEl) keyEl.classList.add('active');
+
             if (this.game.isSolving) return;
             switch(e.key) {
                 case 'ArrowUp': this.game.move(0, -1); break;
@@ -22,6 +31,16 @@ export class Input {
                 case 'r': this.game.restart(); break;
                 case 'd': this.game.setDebug(!this.game.debug); break;
             }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            let keyEl = null;
+            if (e.key === 'ArrowUp') keyEl = document.getElementById('key-up');
+            else if (e.key === 'ArrowDown') keyEl = document.getElementById('key-down');
+            else if (e.key === 'ArrowLeft') keyEl = document.getElementById('key-left');
+            else if (e.key === 'ArrowRight') keyEl = document.getElementById('key-right');
+            else if (e.key === 'r' || e.key === 'R') keyEl = document.getElementById('key-r');
+            if (keyEl) keyEl.classList.remove('active');
         });
     }
 
