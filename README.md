@@ -1,8 +1,5 @@
 # Slide
 
-![Home Screen](screenshots/image (1))
-![Gameplay](screenshots/image (2))
-
 A browser-playable Zen puzzle game built around momentum-based sliding mechanics and procedurally generated infinite levels.
 
 ## How to Play
