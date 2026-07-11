@@ -76,18 +76,18 @@
 </div>
 
 <div id="difficulty-overlay" class="overlay hidden">
-    <div class="max-w-xs w-full bg-white p-8 border border-black/5 shadow-2xl">
-        <h2 class="text-xl font-bold mb-6">Select Grid</h2>
-        <div class="flex flex-col key-grid gap-2 mb-8">
-            <button onclick="game.init(6)" class="btn bg-slate-200 !text-black hover:!bg-slate-300">Small (6x6)</button>
+    <div class="settings-panel">
+        <h2 class="settings-title">Select Grid</h2>
+        <div class="flex flex-col gap-2 mb-8">
+            <button onclick="game.init(6)" class="btn btn-secondary">Small (6x6)</button>
             <button onclick="game.init(9)" class="btn">Medium (9x9)</button>
-            <button onclick="game.init(12)" class="btn bg-red-100 !text-red-700">Large (12x12)</button>
+            <button onclick="game.init(12)" class="btn btn-secondary">Large (12x12)</button>
         </div>
 
-        <h2 class="text-xl font-bold mb-6">Select Theme</h2>
+        <h2 class="settings-title">Select Theme</h2>
         <div class="flex flex-col gap-2">
             <button onclick="game.setTheme('minimal')" class="btn btn-secondary">Minimal</button>
-            <button onclick="game.setTheme('ethereal')" class="btn btn-secondary !bg-indigo-100 !text-indigo-900">Ethereal</button>
+            <button onclick="game.setTheme('ethereal')" class="btn btn-secondary">Ethereal</button>
         </div>
         <button onclick="ui.hideDifficultyOverlay()" class="btn mt-6 w-full">Close</button>
     </div>

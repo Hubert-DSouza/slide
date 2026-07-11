@@ -1,5 +1,8 @@
 export const TILE_EMPTY = 0;
 export const TILE_WALL = 1;
+export const TILE_FRAGILE = 2;
+export const TILE_TELEPORT_A = 3;
+export const TILE_TELEPORT_B = 4;
 
 export const COLORS = {
     BG: '#fdfaf7',
