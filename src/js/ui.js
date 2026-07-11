@@ -137,4 +137,37 @@ export class UI {
             }
         }
     }
+
+    showTutorialInstruction(levelNum) {
+        const el = document.getElementById('tutorial-instruction');
+        if (!el) return;
+
+        const instructions = {
+            1: "Slide to the goal.",
+            2: "You'll stop when you hit a wall.",
+            3: "Try finding a way around.",
+            4: "You're getting the hang of it.",
+            5: "Not so hard, right?"
+        };
+
+        if (instructions[levelNum]) {
+            el.innerText = instructions[levelNum];
+            el.classList.remove('hidden');
+        } else {
+            el.innerText = "";
+            el.classList.add('hidden');
+        }
+    }
+
+    updateLevelTitle(title) {
+        const el = document.getElementById('level-title');
+        if (el) {
+            el.innerText = title;
+            if (title) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+    }
 }

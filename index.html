@@ -42,6 +42,7 @@
 <div id="screen-game" class="screen hidden">
     <div class="game-container">
         <aside class="panel">
+            <div id="level-title" class="text-[11px] uppercase font-bold tracking-wider opacity-60 mb-1 text-left w-full">Level 1</div>
             <div class="stat-box stat-moves">
                 <div class="text-[10px] uppercase opacity-40 mb-1">Current Moves</div>
                 <div id="move-count" class="text-4xl font-bold">0</div>
@@ -80,7 +81,8 @@
             </div>
         </aside>
 
-        <main class="flex items-center justify-center relative">
+        <main class="flex flex-col items-center justify-center relative">
+            <div id="tutorial-instruction" class="tutorial-instruction hidden"></div>
             <div class="relative">
                 <canvas id="game-canvas"></canvas>
                 <div id="win-message" class="overlay hidden">

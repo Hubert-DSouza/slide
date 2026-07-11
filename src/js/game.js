@@ -59,8 +59,14 @@ export class Game {
     }
 
     startInfinite(difficulty) {
-        this.mode = 'INFINITE';
         this.infiniteDifficulty = difficulty || 'medium';
+        const hasCompletedTutorial = localStorage.getItem('blockslide_tutorial_completed') === 'true';
+        if (!hasCompletedTutorial) {
+            this.startTutorialLevel(1);
+            return;
+        }
+
+        this.mode = 'INFINITE';
         if (this.infiniteDifficulty === 'easy') this.size = 6;
         if (this.infiniteDifficulty === 'medium') this.size = 9;
         if (this.infiniteDifficulty === 'hard') this.size = 12;
@@ -69,21 +75,68 @@ export class Game {
         this.nextLevel();
     }
 
+    startTutorialLevel(index) {
+        this.mode = 'TUTORIAL';
+        this.tutorialLevelIndex = index;
+        
+        this.size = index === 5 ? 4 : 3;
+        this.renderer.resize(this.ui.getCanvasContainer(), this.size);
+        
+        this.ui.showTutorialInstruction(index);
+        this.ui.updateLevelTitle(`Tutorial ${index}/5`);
+        this.ui.showScreen('screen-game');
+        
+        const config = { size: this.size, targetScore: 50 };
+        const palette = getMonochromePalette(index, this.theme.id);
+        this.renderer.setPalette(palette);
+        
+        this.level = this.generator.generate(config, palette.obstacles, index);
+        this.ui.updateScore(this.level.score);
+        
+        this.state = 'PLAYING';
+        this.restart();
+    }
+
     setDebug(value) {
         this.debug = value;
         this.renderer.setDebug(value);
     }
 
     nextLevel(forcedSeed = null) {
+        if (this.mode === 'TUTORIAL') {
+            if (this.tutorialLevelIndex < 5) {
+                this.startTutorialLevel(this.tutorialLevelIndex + 1);
+            } else {
+                localStorage.setItem('blockslide_tutorial_completed', 'true');
+                this.startInfinite(this.infiniteDifficulty);
+            }
+            return;
+        }
+
+        this.ui.showTutorialInstruction(0);
+        
         let seed = forcedSeed || Date.now();
         let targetScore = 50;
-        if (this.size === 6) targetScore = 30;
-        if (this.size === 9) targetScore = 60;
-        if (this.size === 12) targetScore = 90;
+        let minPath = 5, maxPath = 20;
+        
+        if (this.size === 6) {
+            targetScore = 30;
+            minPath = 5;
+            maxPath = 7;
+        } else if (this.size === 9) {
+            targetScore = 60;
+            minPath = 7;
+            maxPath = 9;
+        } else if (this.size === 12) {
+            targetScore = 90;
+            minPath = 8;
+            maxPath = 12;
+        }
 
-        const config = { size: this.size, targetScore };
+        const config = { size: this.size, targetScore, minPath, maxPath };
         this.renderer.resize(this.ui.getCanvasContainer(), this.size);
         
+        this.ui.updateLevelTitle('');
         this.ui.updateLevelId(seed);
         
         // Generate and set monochrome palette for level theme
@@ -169,9 +222,11 @@ export class Game {
         let cx = this.player.x, cy = this.player.y;
         while (true) {
             const nx = cx + dx, ny = cy + dy;
+            const cols = this.level.size.cols || this.level.size;
+            const rows = this.level.size.rows || this.level.size;
             if (
-                nx < 0 || nx >= this.level.size || 
-                ny < 0 || ny >= this.level.size || 
+                nx < 0 || nx >= cols || 
+                ny < 0 || ny >= rows || 
                 this.level.grid[ny][nx] === TILE_WALL
             ) break;
             cx = nx; 

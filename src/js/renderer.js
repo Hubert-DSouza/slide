@@ -26,9 +26,18 @@ export class Renderer {
         const style = window.getComputedStyle(container);
         const paddingX = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0);
         const paddingY = parseFloat(style.paddingTop || 0) + parseFloat(style.paddingBottom || 0);
+        // Subtract tutorial instruction height if it's visible in the container
+        let instructionHeight = 0;
+        const instrEl = document.getElementById('tutorial-instruction');
+        if (instrEl && !instrEl.classList.contains('hidden')) {
+            instructionHeight = instrEl.offsetHeight || 60;
+        }
+
         const maxW = Math.max(10, (container.clientWidth - paddingX) * 0.95);
-        const maxH = Math.max(10, (container.clientHeight - paddingY) * 0.95);
+        const maxH = Math.max(10, (container.clientHeight - paddingY - instructionHeight) * 0.95);
         this.tileSize = Math.max(10, Math.min(maxW / cols, maxH / rows));
+
+
 
         const logicalW = cols * this.tileSize;
         const logicalH = rows * this.tileSize;

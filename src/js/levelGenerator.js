@@ -1,6 +1,86 @@
 import { TILE_EMPTY, TILE_WALL, COLORS } from './constants.js';
 import { Solver } from './solver.js';
 
+const TUTORIAL_LEVELS = {
+    1: {
+        size: { cols: 3, rows: 3 },
+        grid: [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ],
+        start: { x: 0, y: 1 },
+        end: { x: 2, y: 1 },
+        par: 1,
+        solution: [{ dx: 1, dy: 0 }],
+        score: 15,
+        solutionCrossings: 0
+    },
+    2: {
+        size: { cols: 3, rows: 3 },
+        grid: [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 1]
+        ],
+        start: { x: 0, y: 0 },
+        end: { x: 2, y: 1 },
+        par: 2,
+        solution: [{ dx: 1, dy: 0 }, { dx: 0, dy: 1 }],
+        score: 18,
+        solutionCrossings: 0
+    },
+    3: {
+        size: { cols: 3, rows: 3 },
+        grid: [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+        ],
+        start: { x: 0, y: 1 },
+        end: { x: 2, y: 1 },
+        par: 3,
+        solution: [{ dx: 0, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }],
+        score: 20,
+        solutionCrossings: 0
+    },
+    4: {
+        size: { cols: 3, rows: 3 },
+        grid: [
+            [0, 0, 0],
+            [1, 0, 0],
+            [0, 0, 0]
+        ],
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 2 },
+        par: 3,
+        solution: [{ dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }],
+        score: 22,
+        solutionCrossings: 0
+    },
+    5: {
+        size: { cols: 4, rows: 4 },
+        grid: [
+            [0, 0, 1, 0],
+            [0, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 0, 1]
+        ],
+        start: { x: 0, y: 0 },
+        end: { x: 2, y: 2 },
+        par: 5,
+        solution: [
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: 1 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: 1 },
+            { dx: -1, dy: 0 }
+        ],
+        score: 25,
+        solutionCrossings: 0
+    }
+};
+
 export class LevelGenerator {
     constructor() {
         this.seed = Date.now();
@@ -28,6 +108,25 @@ export class LevelGenerator {
     }
 
     generate(config, blockColors = COLORS.BLOCKS, baseSeed = Date.now()) {
+        // Handle tutorial levels (1 to 5)
+        if (baseSeed >= 1 && baseSeed <= 5) {
+            const tutorial = TUTORIAL_LEVELS[baseSeed];
+            if (tutorial) {
+                const random = this.mulberry32(this.hash(baseSeed));
+                const cols = tutorial.size.cols;
+                const rows = tutorial.size.rows;
+                const colorGrid = Array(rows).fill().map(() => 
+                    Array(cols).fill('').map(() => blockColors[Math.floor(random() * blockColors.length)])
+                );
+                return {
+                    ...tutorial,
+                    grid: tutorial.grid.map(row => [...row]),
+                    colorGrid,
+                    seed: baseSeed
+                };
+            }
+        }
+
         // Handle old signature fallback if needed during transition
         if (typeof config === 'number') {
             config = { size: config, targetScore: 50 };
@@ -35,6 +134,8 @@ export class LevelGenerator {
 
         const size = config.size || 6;
         const targetScore = config.targetScore || 50;
+        const minPath = config.minPath || 5;
+        const maxPath = config.maxPath || 20;
         const focus = config.focus || {};
         const density = focus.density || 0.22;
         
@@ -95,7 +196,7 @@ export class LevelGenerator {
 
             const analysis = Solver.analyze(size, grid, start, end);
             
-            if (analysis.solution && analysis.solution.length >= 5) {
+            if (analysis.solution && analysis.solution.length >= minPath && analysis.solution.length <= maxPath) {
                 const scoreData = this.evaluateLevel(analysis, size, focus);
                 const diff = Math.abs(scoreData.normalized - targetScore);
                 
