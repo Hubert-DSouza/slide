@@ -55,12 +55,47 @@ export class Solver {
             }
         }
 
+        // Count decision intersections along the solution path
+        let solutionIntersections = 0;
+        if (solution) {
+            let cx = start.x;
+            let cy = start.y;
+            for (let i = 0; i < solution.length; i++) {
+                const dir = solution[i];
+                
+                // Count how many directions are open from this stopping node
+                let validChoicesAtNode = 0;
+                for (const d of dirs) {
+                    const nx = cx + d.dx, ny = cy + d.dy;
+                    if (nx >= 0 && nx < size && ny >= 0 && ny < size && grid[ny][nx] !== TILE_WALL) {
+                        validChoicesAtNode++;
+                    }
+                }
+                
+                if (i === 0) {
+                    if (validChoicesAtNode > 1) solutionIntersections++;
+                } else {
+                    // Exclude backtracking direction (which would be 1 choice)
+                    if (validChoicesAtNode > 2) solutionIntersections++;
+                }
+
+                // Simulate slide to next stopping node
+                while (true) {
+                    const nx = cx + dir.dx, ny = cy + dir.dy;
+                    if (nx < 0 || nx >= size || ny < 0 || ny >= size || grid[ny][nx] === TILE_WALL) break;
+                    cx = nx;
+                    cy = ny;
+                }
+            }
+        }
+
         return {
             solution,
             allPaths,
             reachableStates: visited.size,
             totalMovesExplored,
-            initialMoves
+            initialMoves,
+            solutionIntersections
         };
     }
 }

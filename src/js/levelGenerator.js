@@ -131,7 +131,7 @@ export class LevelGenerator {
     }
 
     evaluateLevel(analysis, size, focus) {
-        const { solution, reachableStates, totalMovesExplored, initialMoves } = analysis;
+        const { solution, reachableStates, totalMovesExplored, initialMoves, solutionIntersections } = analysis;
         
         const len = solution.length;
         const stateRatio = reachableStates / (size * size);
@@ -147,7 +147,8 @@ export class LevelGenerator {
                   (initialMoves * 12 * branchWeight) + 
                   (decisionDensity * 8 * branchWeight) + 
                   (stateRatio * 40 * stateCompressionWeight) + 
-                  (uniqueDirs * 4 * deceptionWeight);
+                  (uniqueDirs * 4 * deceptionWeight) +
+                  ((solutionIntersections || 0) * 15 * branchWeight);
         
         const baseline = 35 + (size / 2); 
         let normalized = ((raw - baseline) / (size * 6)) * 100;
