@@ -14,7 +14,7 @@
     <!-- Container for dynamically generated decorative background blocks -->
     <div id="home-decor-container" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1;"></div>
 
-    <h1 class="home-logo">Slide</h1>
+    <h1 class="home-logo">SLIDE.</h1>
 
     <div class="home-btn-group">
         <button id="btn-home-play" class="home-btn home-btn-primary" onclick="ui.showScreen('screen-game'); game.startInfinite('medium')">
@@ -33,11 +33,10 @@
                 <div id="move-count" class="text-4xl font-bold">0</div>
             </div>
             <div class="stat-box stat-target">
-                <div class="text-[10px] uppercase opacity-40 mb-1">Target</div>
-                <div id="par-count" class="text-xl font-bold">00</div>
+                <div class="text-[10px] uppercase opacity-40 mb-1">Optimal</div>
+                <div id="par-count" class="text-4xl font-bold">00</div>
             </div>
             <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-1">
-                <button onclick="game.undo()" class="btn btn-undo">Undo</button>
                 <button onclick="game.restart()" class="btn btn-reset">Reset</button>
                 <button onclick="ui.showScreen('screen-home')" class="btn btn-secondary btn-menu">Menu</button>
             </div>
@@ -56,17 +55,6 @@
         </main>
 
         <aside class="panel text-right">
-            <div class="text-[10px] uppercase opacity-40 tracking-widest hidden md:block">Navigation</div>
-            <div class="stat-box stat-level text-left">
-                <div class="mb-4">
-                    <div id="level-id" class="text-xs opacity-50 font-mono">SEED: 0</div>
-                    <div id="level-score" class="text-xs opacity-50 font-mono">SCORE: 0/100</div>
-                </div>
-            </div>
-            <div class="stat-box text-left hidden md:block">
-                <div class="text-[10px] uppercase opacity-40 mb-2">Instructions</div>
-                <p class="text-[11px] leading-relaxed opacity-60">Slide to reach the red goal.</p>
-            </div>
             <div class="mt-auto flex flex-col gap-2 w-full btn-wrapper-2">
                 <button onclick="game.showSolution()" class="btn btn-secondary w-full btn-solution">Show Solution</button>
                 <button onclick="ui.showDifficultyOverlay()" class="btn w-full btn-size">Settings</button>

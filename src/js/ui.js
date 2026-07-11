@@ -86,11 +86,16 @@ export class UI {
     }
 
     updateLevelId(seed) {
-        this.elements.levelId.innerText = `SEED: ${seed}`;
+        if (this.elements.levelId) {
+            this.elements.levelId.innerText = `SEED: ${seed}`;
+        }
     }
 
     updateScore(score) {
-        document.getElementById('level-score').innerText = `SCORE: ${score}/100`;
+        const scoreEl = document.getElementById('level-score');
+        if (scoreEl) {
+            scoreEl.innerText = `SCORE: ${score}/100`;
+        }
     }
 
     showWinMessage() {
